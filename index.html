@@ -51,9 +51,17 @@
     /* ── VIDEO ── */
     .video-section { background: #fff; }
     .video-section .section-subtitle { max-width: 540px; margin: 0 auto 44px; }
-    .video-wrap { max-width: 800px; margin: 0 auto; border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-blue); border: 2px solid rgba(19,84,232,0.10); }
-    .video-ratio { position: relative; padding-bottom: 56.25%; background: #000; }
-    .video-ratio video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; object-fit: contain; }
+    .video-wrap { max-width: 800px; margin: 0 auto; border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-blue); border: 2px solid rgba(19,84,232,0.10); position: relative; cursor: pointer; user-select: none; background: #000; }
+    .video-wrap video { width: 100%; display: block; object-fit: contain; pointer-events: none; }
+    .video-wrap video::-webkit-media-controls { display: none !important; }
+    .video-wrap video::-webkit-media-controls-enclosure { display: none !important; }
+    .video-wrap video::-webkit-media-controls-panel { display: none !important; }
+    .play-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 15; transition: opacity 0.3s; pointer-events: none; }
+    .play-overlay.playing { opacity: 0; }
+    .play-btn-icon { width: 68px; height: 68px; background: rgba(255,255,255,0.92); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 28px rgba(0,0,0,0.28); }
+    .play-btn-icon svg { width: 26px; height: 26px; margin-left: 5px; }
+    .vsl-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 5px; background: rgba(255,255,255,0.18); z-index: 20; pointer-events: none; }
+    .vsl-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #1354e8, #60a5fa); transition: width 0.8s ease; }
 
     /* ── STEPS ── */
     .steps-section { background: var(--off-white); }
@@ -138,16 +146,16 @@
     <p class="eyebrow">Step one</p>
     <h2 class="section-title">Watch this first</h2>
     <p class="section-subtitle">This covers exactly how we build your website, what's included, and what to expect on our call.</p>
-    <div class="video-wrap">
-      <div class="video-ratio">
-        <video
-          src="https://nhflmisklsanfiiywrfo.supabase.co/storage/v1/object/public/landing-page-assets/videos/website-precall-vsl.mp4"
-          controls
-          preload="metadata"
-          playsinline
-          title="What we build for your business">
-        </video>
+    <div class="video-wrap" id="videoWrap" onclick="togglePlay()">
+      <video id="mainVideo" preload="metadata" playsinline>
+        <source src="https://nhflmisklsanfiiywrfo.supabase.co/storage/v1/object/public/landing-page-assets/videos/website-precall-vsl.mp4" type="video/mp4">
+      </video>
+      <div class="play-overlay" id="playOverlay">
+        <div class="play-btn-icon">
+          <svg viewBox="0 0 24 24" fill="#1354e8"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
       </div>
+      <div class="vsl-progress"><div class="vsl-progress-fill" id="progressFill"></div></div>
     </div>
   </div>
 </section>
@@ -353,6 +361,29 @@
 </section>
 
 <script>
+  // ── VSL player ──
+  const vslVideo   = document.getElementById('mainVideo');
+  const vslOverlay = document.getElementById('playOverlay');
+  const vslFill    = document.getElementById('progressFill');
+
+  function togglePlay() {
+    vslVideo.paused ? vslVideo.play() : vslVideo.pause();
+  }
+
+  vslVideo.addEventListener('play',  () => vslOverlay.classList.add('playing'));
+  vslVideo.addEventListener('pause', () => vslOverlay.classList.remove('playing'));
+  vslVideo.addEventListener('ended', () => vslOverlay.classList.remove('playing'));
+
+  // Progress bar: first 30% of playback fills bar to 50% (fast), then slows to 100%
+  vslVideo.addEventListener('timeupdate', () => {
+    if (!vslVideo.duration) return;
+    const vp = vslVideo.currentTime / vslVideo.duration;
+    const bp = vp < 0.3 ? (vp / 0.3) * 0.5 : 0.5 + ((vp - 0.3) / 0.7) * 0.5;
+    vslFill.style.width = (bp * 100).toFixed(2) + '%';
+  });
+
+  vslVideo.addEventListener('contextmenu', e => e.preventDefault());
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
