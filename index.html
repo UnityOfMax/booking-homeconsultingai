@@ -52,8 +52,8 @@
     .video-section { background: #fff; }
     .video-section .section-subtitle { max-width: 540px; margin: 0 auto 44px; }
     .video-wrap { max-width: 800px; margin: 0 auto; border-radius: 20px; overflow: hidden; box-shadow: var(--shadow-blue); border: 2px solid rgba(19,84,232,0.10); }
-    .video-ratio { position: relative; padding-bottom: 56.25%; background: var(--blue-950); }
-    .video-ratio iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .video-ratio { position: relative; padding-bottom: 56.25%; background: #000; }
+    .video-ratio video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; object-fit: contain; }
 
     /* ── STEPS ── */
     .steps-section { background: var(--off-white); }
@@ -140,7 +140,13 @@
     <p class="section-subtitle">This covers exactly how we build your website, what's included, and what to expect on our call.</p>
     <div class="video-wrap">
       <div class="video-ratio">
-        <iframe src="https://www.loom.com/embed/PRECALL_VIDEO_ID?hideEmbedTopBar=true" title="What we build for your business" allow="fullscreen" allowfullscreen></iframe>
+        <video
+          src="https://nhflmisklsanfiiywrfo.supabase.co/storage/v1/object/public/landing-page-assets/videos/website-precall-vsl.mp4"
+          controls
+          preload="metadata"
+          playsinline
+          title="What we build for your business">
+        </video>
       </div>
     </div>
   </div>
